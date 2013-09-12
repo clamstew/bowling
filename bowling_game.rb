@@ -1,8 +1,17 @@
 class BowlingGame
   attr_accessor :rolls
   
+  # Instantiate a new topping.
+  #
+  # @rolls - The Array of rolls scores in a game of bowling
+  # @total_score - The Integer of the total score of a given game
+  # @current_roll = The Integer number of the current roll of the game (1..21)
+  #
+  # Returns a new BowlingGame object.
   def initialize
     @rolls = []
+    @total_score  = 0
+    @current_roll = 0
   end
 
   # Record a roll in the game.
@@ -17,25 +26,61 @@ class BowlingGame
   # Returns the Integer score for this game. Expects to be run after all rolls
   # for the game have been recorded.
   def score
-    total_score  = 0
-    current_roll = 0
+    while @current_roll < @rolls.size - 1
+      init_roll
 
-    while current_roll < @rolls.size - 1
-      roll      = @rolls[current_roll]
-      next_roll = @rolls[current_roll + 1]
-
-      if roll == 10
-        total_score += 10 + next_roll + @rolls[current_roll + 2]
-        current_roll += 1
-      elsif roll + next_roll == 10
-        total_score += 10 + @rolls[current_roll + 2]
-        current_roll += 2
-      else 
-        total_score += roll + next_roll
-        current_roll += 2
+      if strike?
+        score_strike
+      elsif spare?
+        score_spare
+      else
+        score_frame
       end
     end
-    
-    total_score
+
+    return @total_score
   end
+
+  private
+    # Initialize values for roll and next_roll.
+    #
+    # Returns nothing.
+    def init_roll
+      @roll      = @rolls[@current_roll]
+      @next_roll = @rolls[@current_roll + 1]
+    end
+
+    # Returns true if the current roll is a strike, false otherwise.
+    def strike?
+      @roll == 10
+    end
+
+    # Scores a strike frame, and adds it to the total score for the game.
+    #
+    # Returns nothing.
+    def score_strike
+      @total_score += 10 + @next_roll + @rolls[@current_roll + 2]
+      @current_roll += 1
+    end
+
+    # returns true if the current roll is a spare, false otherwise.
+    def spare?
+      @roll + @next_roll == 10
+    end
+
+    # Scores a spare frame, and adds it to the total score for the game.
+    #
+    # Returns nothing.
+    def score_spare
+      @total_score += 10 + @rolls[@current_roll + 2]
+      @current_roll += 2
+    end
+    
+    # Scores a normal (non-spare / non-strike) frame, and adds it to the total score for the game.
+    #
+    # Returns nothing.
+    def score_frame
+      @total_score += @roll + @next_roll
+      @current_roll += 2
+    end
 end
